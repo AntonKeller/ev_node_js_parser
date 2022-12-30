@@ -5,7 +5,7 @@
   "main": "puppeteer_parse/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node puppeteer_parse/screenshoter/index.js"
+    "start": "node puppeteer_parse/screener/index.js"
   },
   "keywords": [],
   "author": "",
