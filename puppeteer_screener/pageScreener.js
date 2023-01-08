@@ -1,6 +1,5 @@
 const path = require('node:path');
 
-
 async function hideAds(page) {
     let nodeTarget = [
         '#adfox-stretch-banner',
@@ -19,10 +18,7 @@ async function hideAds(page) {
     });
 }
 
-// a.forEach(item => {item.style.cssText = 'display:none'})
-
 async function screen(browser, urls) {
-
     let pagePromise = (link, i) => new Promise(async (res, rej) => {
         let page = await browser.newPage();
         await page.goto(link);
@@ -42,7 +38,6 @@ async function screen(browser, urls) {
     }
 
     // await urls.forEach(await pagePromise);
-
     // await hide(page);
     // console.log('results', results);
     // await page.waitForSelector('body');               // дожидаемся загрузки селектора

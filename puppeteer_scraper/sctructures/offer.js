@@ -1,4 +1,4 @@
-const response_structure = (offer, index) => {
+const responseJsonStructure = (offer, index) => {
     return {
         "№": index + 1,
         "ID предложения": String(offer.cianId),
@@ -26,4 +26,4 @@ const response_structure = (offer, index) => {
     }
 }
 
-module.exports = response_structure;
+module.exports = responseJsonStructure;
