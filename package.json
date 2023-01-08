@@ -2,10 +2,13 @@
   "name": "node_parse_cian",
   "version": "1.0.0",
   "description": "",
-  "main": "puppeteer_parser/index.js",
+  "main": "puppeteer_scraper/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node puppeteer_screener/index.js"
+    "pupscreen": "node puppeteer_screener/index.js",
+    "pupscrap": "node puppeteer_scraper/index.js",
+    "osm": "node osmosis/test.js",
+    "sel": "node selenium/selenium_driver.js"
   },
   "keywords": [],
   "author": "",
@@ -13,7 +16,10 @@
   "dependencies": {
     "chromedriver": "^108.0.0",
     "exceljs": "^4.3.0",
+    "osmosis": "^1.1.10",
     "puppeteer": "^19.4.1",
+    "puppeteer-extra": "^3.3.4",
+    "puppeteer-extra-plugin-stealth": "^2.11.1",
     "selenium-webdriver": "^4.7.1"
   }
 }
