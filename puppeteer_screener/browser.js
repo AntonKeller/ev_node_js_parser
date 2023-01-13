@@ -1,24 +1,42 @@
 const {executablePath} = require('puppeteer')
 const puppeteer = require('puppeteer-extra');
+const stealth= require('puppeteer-extra-plugin-stealth')();
+const {chromium} = require('playwright-extra')
 
-// add stealth plugin and use defaults (all evasion techniques)
-const StealthPlugin = require('puppeteer-extra-plugin-stealth');
-puppeteer.use(StealthPlugin());
+
+chromium.use(stealth);
+
+puppeteer.use(stealth);
+
+async function startBrowserPlaywrightExtra(){
+
+    let browser;
+
+    try {
+        console.log("Opening the browser......");
+        browser = await chromium.launch({headless: true});
+
+    } catch (err) {
+        console.log("Could not create a browser playwright extra instance => : ", err);
+    }
+
+    return browser;
+}
 
 async function startBrowser(){
+
     let browser;
 
     try {
         console.log("Opening the browser......");
         browser = await puppeteer.launch({
-
             headless: true,
             executablePath: executablePath(),
-            // slowMo: 1000,
+            // slowMo: 100,
             // executablePath: "C:\Program Files\Google\Chrome\Application\chrome.exe",
             defaultViewport: {
                 width: 1440,
-                height: 2000,
+                height: 3100,
             },
 
             args: [
@@ -35,5 +53,6 @@ async function startBrowser(){
 }
 
 module.exports = {
-    startBrowser
+    startBrowser,
+    startBrowserPlaywrightExtra,
 };
