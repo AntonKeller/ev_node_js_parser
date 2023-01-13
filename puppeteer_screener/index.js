@@ -1,21 +1,28 @@
 const browserObject = require('./browser');
-const scraperController = require('./pageController');
+const scrapeController = require('./scrapeController');
 
-//Start the browser and create a browser instance
-let browserInstance = browserObject.startBrowser();
+(async function start() {
 
-// test bot: https://bot.sannysoft.com/
+    const isLogging = true;
 
-let urls = [
-    'https://bot.sannysoft.com/',
-    'https://saratov.cian.ru/rent/commercial/238375469/',
-    'https://www.cian.ru/rent/commercial/281335995/',
-    'https://www.cian.ru/rent/commercial/274017408/',
-    'https://www.cian.ru/rent/commercial/281927447/',
-    'https://www.cian.ru/rent/commercial/281878518/',
-]
+    let folders = [
+        "./files_data/data_1.xlsx",
+        "./files_data/data_2.xlsx"
+    ];
 
-// Pass the browser instance to the scraper controller
-scraperController(browserInstance, urls)
-    .then(() => console.log('complete'))
+    // bot testing
+    // let page = await browserInstance.newPage();
+    // await page.goto("https://bot.sannysoft.com");
+    // await page.screenshot({path: `${path.resolve(__dirname)}/TEST_BOT.jpeg`});
+
+    console.log("Start load images from website");
+
+    scrapeController
+        .screenshotScraper(await browserObject.startBrowser(), folders, isLogging)
+        .then(() => console.log('Process completed!'));
+
+})()
+
+
+
 

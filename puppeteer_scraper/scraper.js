@@ -4,9 +4,9 @@ const timeout = ms => new Promise(resolve => setTimeout(() => resolve(), ms));
 
 const scraperObject = {
 
-    async scraper(browser, url) {
+    async scraper(browser, url, isLogging) {
 
-        await get_offers(browser, url);
+        return await get_offers(browser, url, isLogging);
 
     }
 }

@@ -1,13 +1,19 @@
 const path = require('node:path');
 
-async function hideAds(page) {
+const timeout = async ms => new Promise(r => setTimeout(r, ms));
+
+const adCleaner = async (page) => {
+
     let nodeTarget = [
         '#adfox-stretch-banner',
-        '.a10a3f92e9--container--SpAqP', //Реклама справа от объявления
-        '.a10a3f92e9--main--_w7i2', //Реклама в шапке объявления
-        '._25d45facb5--container--zRDqi', // Окно впорос о сохранении cookies
+        '.a10a3f92e9--container--SpAqP',
+        '.a10a3f92e9--main--_w7i2',
+        '._25d45facb5--container--zRDqi',
         '.a10a3f92e9--mortgage-banner--ATbzm',
+        '.a10a3f92e9--container--RgpNj',
     ];
+
+    // console.log('find banners.....');
 
     nodeTarget.map(async cl => {
         await page.evaluate(`
@@ -16,51 +22,142 @@ async function hideAds(page) {
             };
         `)
     });
+
+    // console.log('Banners removed!');
 }
 
-async function screen(browser, urls) {
-    let pagePromise = (link, i) => new Promise(async (res, rej) => {
-        let page = await browser.newPage();
-        await page.goto(link);
-        await hideAds(page);
-        await page.screenshot({
-            // quality: 100, //Качество изображения
-            path: `${path.resolve(__dirname)}/images/logo_${i+1}.jpeg`
-        });
-        await page.close();
-        res(true);
-    });
+const pagePromise = (page, urlObj, timeout_ms = 2000) => new Promise(async response => {
 
-    let index = 0;
+    await page.goto(urlObj.url);
+    await timeout(timeout_ms);
+    // let body = await page.$('body'); ->
+    let body = await page.waitForSelector('body');
+    let body_viewport = await body.boundingBox();
+    let offer_card_page = await page.waitForSelector('.a10a3f92e9--offer_card_page-main--kaTJT');
+    let removedPublicationStatus = false;
 
-    for (let url of urls){
-        await pagePromise(url, index++);
+    if ((await page.$(".a10a3f92e9--container--RXoIe")) !== null) {
+        removedPublicationStatus = true;
     }
 
-    // await urls.forEach(await pagePromise);
-    // await hide(page);
-    // console.log('results', results);
-    // await page.waitForSelector('body');               // дожидаемся загрузки селектора
-    // const logo = await page.$('body');                // объявляем переменную с ElementHandle
-    // const box = await logo.boundingBox();              // данная функция возвращает массив геометрических параметров объекта в пикселях
-    // const x = box['x'];                                // координата x
-    // const y = box['y'];                                // координата y
-    // const w = box['width'];                            // ширина области
-    // const h = box['height'];                           // высота области
-    // const h = 1500;
-    // await page.screenshot({'path': `logo_${index}.png`, 'clip': {'x': x, 'y': y, 'width': w, 'height': h}});     // выполняем скриншот требуемой области и сохраняем его в logo.png
-    // await page.screenshot({path: `logo_${index}.png`});
-    // await browser.close();                             // закрываем браузер
+    if (offer_card_page !== null) {
+
+        await adCleaner(page);
+
+        let offer_card_page_main_viewport = await offer_card_page.boundingBox();
+
+        // common coordinates
+        let x = body_viewport["x"];
+        let w = body_viewport["width"];
+        let y = body_viewport["y"];
+        let h = removedPublicationStatus ? body_viewport["width"] : offer_card_page_main_viewport["height"];
+
+        //screens and response
+        await page.screenshot({
+            // quality: 100, //Качество изображения
+            path: `${path.resolve(__dirname)}/images/${urlObj.index}_${urlObj.urlId}_1.jpeg`,
+            clip: {
+                'x': x,
+                'y': y,
+                'width': w,
+                'height': h,
+            }
+        });
+
+        if (!removedPublicationStatus) {
+            await page.screenshot({
+                // quality: 100, //Качество изображения
+                path: `${path.resolve(__dirname)}/images/${urlObj.index}_${urlObj.urlId}_2.jpeg`,
+                clip: {
+                    'x': x,
+                    'y': h,
+                    'width': w,
+                    'height': h,
+                }
+            });
+        }
+
+        // await page.close();
+        response({status: true, removed: removedPublicationStatus, ...urlObj});
+
+    } else {
+        // await page.close();
+        response({status: false, removed: removedPublicationStatus, ...urlObj});
+    }
+});
+
+const screen = async (browser, arrayObjectsUrl, timeout_ms = 20000) => {
+
+    //copy arrayObjectsUrl in buffer
+
+    let bufferUrlsObj = [];
+    let index = 1;
+
+    for (let urlOb of arrayObjectsUrl) {
+        bufferUrlsObj.push({
+            index: index,
+            url: urlOb.url,
+            urlId: urlOb.urlId
+        });
+        index++;
+    }
+
+    // go requests for bufferUrlsObj
+    let errArrayIdUrls = [];
+    let resultUrlsObj = [];
+    let requestsSeriesCount = 1;
+    let removedPublications = 0;
+    let page = await browser.newPage();
+    do {
+
+        console.log(`\n\nrequests series count [${requestsSeriesCount}]:`);
+
+        for (let urlOb of bufferUrlsObj) {
+
+            console.time('FirstWay');
+            let responseStatus = await pagePromise(page, urlOb);
+            console.timeEnd('FirstWay');
+            if (responseStatus.removed) {
+                removedPublications++;
+            }
+
+            if (!responseStatus.status) {  //unsuccessful request
+                console.log(`progress:[${urlOb.index}/${bufferUrlsObj.length}][${urlOb.url}][${urlOb.urlId}][err]`);
+                errArrayIdUrls.push({
+                    index: urlOb.index,
+                    url: urlOb.url,
+                    urlId: urlOb.urlId
+                })
+            } else { //successful request
+                console.log(`progress:[${urlOb.index}/${bufferUrlsObj.length}][${urlOb.url}][${urlOb.urlId}][complete][removed:${responseStatus.removed}]`);
+                resultUrlsObj.push({
+                    index: urlOb.index,
+                    url: urlOb.url,
+                    urlId: urlOb.urlId
+                })
+            }
+        }
+
+        console.log(`err requests: [${errArrayIdUrls.length}]`);
+        console.log(`removed publications: [${removedPublications - errArrayIdUrls.length}]`);
+        console.log(`timeout 20 sec`);
+        bufferUrlsObj = errArrayIdUrls;
+        requestsSeriesCount++;
+        if (errArrayIdUrls.length === 0) break;
+        await timeout(timeout_ms);
+
+    } while (requestsSeriesCount >= 5)
+    await page.close();
+    console.log("errArrayIdUrls:", errArrayIdUrls);
 }
 
 const screenerObject = {
 
-    async screener(browser, urls) {
+    async screener(browser, arrayObjectsUrl) {
 
-        await screen(browser, urls);
+        await screen(browser, arrayObjectsUrl);
 
     }
-
 }
 
 module.exports = screenerObject;
