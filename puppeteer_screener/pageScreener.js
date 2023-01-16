@@ -26,7 +26,7 @@ const adCleaner = async (page) => {
     // console.log('Banners removed!');
 }
 
-const pagePromise = (page, urlObj, timeout_ms = 2000) => new Promise(async response => {
+const pagePromise = (page, urlObj, timeout_ms = 1500) => new Promise(async response => {
 
     await page.goto(urlObj.url);
     await timeout(timeout_ms);
@@ -42,6 +42,8 @@ const pagePromise = (page, urlObj, timeout_ms = 2000) => new Promise(async respo
 
     if (offer_card_page !== null) {
 
+        let result;
+
         await adCleaner(page);
 
         let offer_card_page_main_viewport = await offer_card_page.boundingBox();
@@ -51,11 +53,12 @@ const pagePromise = (page, urlObj, timeout_ms = 2000) => new Promise(async respo
         let w = body_viewport["width"];
         let y = body_viewport["y"];
         let h = removedPublicationStatus ? body_viewport["width"] : offer_card_page_main_viewport["height"];
+        let SecondScreenName = undefined;
 
         //screens and response
         await page.screenshot({
             // quality: 100, //Качество изображения
-            path: `${path.resolve(__dirname)}/images/${urlObj.index}_${urlObj.urlId}_1.jpeg`,
+            path: `${path.resolve(__dirname)}/images/${urlObj.urlId}_1.jpeg`,
             clip: {
                 'x': x,
                 'y': y,
@@ -64,10 +67,14 @@ const pagePromise = (page, urlObj, timeout_ms = 2000) => new Promise(async respo
             }
         });
 
+
         if (!removedPublicationStatus) {
+
+            SecondScreenName = `${urlObj.urlId}_2.jpeg`;
+
             await page.screenshot({
                 // quality: 100, //Качество изображения
-                path: `${path.resolve(__dirname)}/images/${urlObj.index}_${urlObj.urlId}_2.jpeg`,
+                path: `${path.resolve(__dirname)}/images/${urlObj.urlId}_2.jpeg`,
                 clip: {
                     'x': x,
                     'y': h,
@@ -78,11 +85,23 @@ const pagePromise = (page, urlObj, timeout_ms = 2000) => new Promise(async respo
         }
 
         // await page.close();
-        response({status: true, removed: removedPublicationStatus, ...urlObj});
+        response({
+            status: true,
+            data: [
+                {removed: removedPublicationStatus, ...urlObj, name: `${urlObj.urlId}_1.jpeg`,},
+                {removed: removedPublicationStatus, ...urlObj, name: SecondScreenName,}
+            ]
+        });
 
     } else {
         // await page.close();
-        response({status: false, removed: removedPublicationStatus, ...urlObj});
+        response({
+            status: false,
+            data: [
+                {removed: removedPublicationStatus, ...urlObj},
+                {removed: removedPublicationStatus, ...urlObj}
+            ]
+        });
     }
 });
 
@@ -96,6 +115,8 @@ const screen = async (browser, arrayObjectsUrl, timeout_ms = 20000) => {
     for (let urlOb of arrayObjectsUrl) {
         bufferUrlsObj.push({
             index: index,
+            sheetName: urlOb.sheetName,
+            path: urlOb.path,
             url: urlOb.url,
             urlId: urlOb.urlId
         });
@@ -108,6 +129,7 @@ const screen = async (browser, arrayObjectsUrl, timeout_ms = 20000) => {
     let requestsSeriesCount = 1;
     let removedPublications = 0;
     let page = await browser.newPage();
+
     do {
 
         console.log(`\n\nrequests series count [${requestsSeriesCount}]:`);
@@ -122,19 +144,14 @@ const screen = async (browser, arrayObjectsUrl, timeout_ms = 20000) => {
             }
 
             if (!responseStatus.status) {  //unsuccessful request
-                console.log(`progress:[${urlOb.index}/${bufferUrlsObj.length}][${urlOb.url}][${urlOb.urlId}][err]`);
-                errArrayIdUrls.push({
-                    index: urlOb.index,
-                    url: urlOb.url,
-                    urlId: urlOb.urlId
-                })
+                errArrayIdUrls.push(responseStatus.data[0]);
+                console.log(`progress:[${responseStatus.data[0].index}/${responseStatus.data[0].length}][${responseStatus.data[0].url}][${responseStatus.data[0].urlId}][err]`);
             } else { //successful request
-                console.log(`progress:[${urlOb.index}/${bufferUrlsObj.length}][${urlOb.url}][${urlOb.urlId}][complete][removed:${responseStatus.removed}]`);
-                resultUrlsObj.push({
-                    index: urlOb.index,
-                    url: urlOb.url,
-                    urlId: urlOb.urlId
-                })
+
+                for (let buff of responseStatus.data) {
+                    console.log(`progress:[${buff.index}/${buff.length}][${buff.url}][${buff.urlId}][complete][removed:${buff.removed}]`);
+                    if (buff.name) resultUrlsObj.push(buff);
+                }
             }
         }
 
@@ -147,15 +164,17 @@ const screen = async (browser, arrayObjectsUrl, timeout_ms = 20000) => {
         await timeout(timeout_ms);
 
     } while (requestsSeriesCount >= 5)
+
     await page.close();
     console.log("errArrayIdUrls:", errArrayIdUrls);
+    return resultUrlsObj;
 }
 
 const screenerObject = {
 
     async screener(browser, arrayObjectsUrl) {
 
-        await screen(browser, arrayObjectsUrl);
+        return await screen(browser, arrayObjectsUrl);
 
     }
 }

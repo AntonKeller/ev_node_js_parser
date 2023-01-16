@@ -3,11 +3,17 @@ const scrapeController = require('./scrapeController');
 
 (async function start() {
 
+    //X:\NewEvConsDocs\СОГАЗ\МСФО_2022\2 Working\Расчеты\СП_2022\СП_коммерческая_1.xlsx
+    // X:\NewEvConsDocs\СОГАЗ\МСФО_2022\2 Working\Расчеты\СП_2022\СП_коммерческая_2.xlsx
+    //
+    // Папка
+    // X:\NewEvConsDocs\СОГАЗ\МСФО_2022\4 Report\Приложения\скрины
+
     const isLogging = true;
 
     let folders = [
-        "./files_data/data_1.xlsx",
-        "./files_data/data_2.xlsx"
+        "C:\\projects\\test\\puppeteer_screener\\files_data\\СП_коммерческая_1.xlsx",
+        "C:\\projects\\test\\puppeteer_screener\\files_data\\СП_коммерческая_2.xlsx"
     ];
 
     // bot testing
