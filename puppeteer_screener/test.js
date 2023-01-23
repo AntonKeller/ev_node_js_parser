@@ -10,7 +10,7 @@ const stealth = require('puppeteer-extra-plugin-stealth')()
 chromium.use(stealth)
 
 // That's it, the rest is playwright usage as normal 😊
-chromium.launch({headless: true})
+chromium.launch({headless: false})
     .then(async browser => {
         const page = await browser.newPage()
 
@@ -18,8 +18,8 @@ chromium.launch({headless: true})
         await page.goto('https://bot.sannysoft.com', {waitUntil: 'networkidle'})
         await page.screenshot({path: 'stealth.png', fullPage: true})
 
-        console.log('All done, check the screenshot. ✨')
-        await browser.close()
+        console.log('All done, check the screenshot. ✨');
+        // await browser.close()
     })
 
 
