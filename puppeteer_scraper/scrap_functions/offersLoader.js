@@ -2,7 +2,7 @@ const {COUNT_OFFERS_IN_ONE_PAGE, COUNT_PAGES_MAX, getOffer} = require("../sctruc
 
 const timeout = ms => new Promise(resolve => setTimeout(resolve, ms));
 
-const useRemoteConsole = (page, url, sleep_ms = 1000) => new Promise(async resolve => {
+const useRemoteConsole = (page, url, sleep_ms = 1200) => new Promise(async resolve => {
 
     await page.goto(url);
     await timeout(sleep_ms);
@@ -36,18 +36,19 @@ const urlsGenerate = async (page, baseLink, getPageStateData) => {
 
 
 // website offers request
-const loadOffersFromWebsite = async (browser, baseLink, getPageStateData) => {
+const loadOffersFromWebsite = async (browser, locationID, config) => {
 
-
+    // config.baseLink(locationID), config.getPageStateData, config.offerType
+    let baseLink = config.baseLink(locationID);
     let page = await browser.newPage();
-    let urls = await urlsGenerate(page, baseLink, getPageStateData);
+    let urls = await urlsGenerate(page, baseLink, config.getPageStateData);
     let responseOffersFullData = [];
 
 
     for (let i = 0; i < urls.length; i++) {
-        let buff = getPageStateData(await useRemoteConsole(page, urls[i]));
+        let buff = config.getPageStateData(await useRemoteConsole(page, urls[i]));
         responseOffersFullData = responseOffersFullData.concat(buff.offers);
-        console.log('loading.....', `${i + 1}/${urls.length}`);
+        console.log(`Загрузка: ${config.offerName}.....`, `${i + 1}/${urls.length}`);
     }
 
 

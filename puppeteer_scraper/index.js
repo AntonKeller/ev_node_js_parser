@@ -6,25 +6,12 @@ const scraperController = require('./controller');
 
     let browserInstance = await browserObject.startBrowser();
 
-    //176083
-    //2 СПБ
-    await scraperController(browserInstance, '4927', true);
+    await scraperController(browserInstance, "кемерово", true);
 
     process.exit();
 
 })();
 
-
-// const scrape = async location => {
-//     let browserInstance = await browserObject.startBrowser();
-//     await scraperController(browserInstance, '176083', true, false);
-//     process.exit();
-//
-// }
-
-//
-// console.log('Enter something: ');
-// process.openStdin().on('data', scrape);
 
 
 

@@ -27,9 +27,9 @@ const translate = enWord => {
         building: "Здание",
         buildingRent: "Здание",
         buildingSale: "Здание",
-        freeAppointment: "Помещение общего назначения",
-        freeAppointmentObjectRent: "Помещение общего назначения",
-        freeAppointmentObjectSale: "Помещение общего назначения",
+        freeAppointment: "Помещение свободного назначения",
+        freeAppointmentObjectRent: "Помещение свободного назначения",
+        freeAppointmentObjectSale: "Помещение свободного назначения",
         business: "Готовый бизнес",
         businessSale: "Готовый бизнес",
         rent: "аренда",
@@ -52,7 +52,6 @@ const translate = enWord => {
         sotka: "сотка",
         multilevel: "Многоуровневая",
     };
-
     return data[enWord] || enWord;
 }
 
@@ -163,7 +162,7 @@ const Offer = {
         // leaseTermType: "Условия аренды",
 
         const objectReturn = {
-            number: index || plug,
+            number: 0,
             id: offer?.cianId || plug,
             cadastralNumber: offer.cadastralNumber || plug,
             category: offer.category || plug,

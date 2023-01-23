@@ -7,15 +7,19 @@ const CianScraperObject = {
 
     jsonPagesScrape: async (browser, locationID) => {
 
-        console.log('find rent offers.....');
+        console.log('Start search offers.....');
 
         let offersArray = [];
         let requestConfig = CianConfig.requestConfig;
 
         for (let config of requestConfig) {
-            const buff = await loadOffersFromWebsite(browser, config.baseLink(locationID), config.getPageStateData);
+            const buff = await loadOffersFromWebsite(browser, locationID, config);
             offersArray = offersArray.concat(buff);
             await timeout(2000);
+        }
+
+        for (let i = 0; i < offersArray.length; i++) {
+            offersArray[i].number = i + 1;
         }
 
         return offersArray;
