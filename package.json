@@ -14,6 +14,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@nbelyh/exceljs": "^4.3.2",
     "chromedriver": "^108.0.0",
     "exceljs": "^4.3.0",
     "osmosis": "^1.1.10",

@@ -1,5 +1,5 @@
 const pageScreenerObject = require('./pageScreener');
-const writeInExcel = require("./exceljs/excelWriter");
+const {ExcelWriter, F_XLSX} = require("./exceljs/ExcelWriter");
 const loadUrlsFromExcel = require("./exceljs/urlsLoader")
 
 const createArrayFromObject = arrayObjectsUrls => {
@@ -45,7 +45,7 @@ const scrapeController = {
 
             // Create matrix and save data in excel,
             console.log("save matrix.....");
-            await writeInExcel(createArrayFromObject(saveInExcelObjectsUrl), "matrix");
+            await ExcelWriter.writeInExcel(createArrayFromObject(saveInExcelObjectsUrl), "matrix", F_XLSX);
 
 
         } catch (err) {
