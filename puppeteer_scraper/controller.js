@@ -2,6 +2,7 @@ const CianScraperObject = require('./scraper');
 const {ExcelWriter} = require("../puppeteer_screener/exceljs/ExcelWriter");
 const {offerDescriptions, offerKeys} = require("./sctructures/offer");
 const searchLocationIdByName = require("./Geo");
+const {FlatConfig, CommercialConfig} = require("./cianConfig");
 
 async function scrapeAll(browserInstance, locationName, isAutoClose) {
     let browser;
@@ -9,20 +10,24 @@ async function scrapeAll(browserInstance, locationName, isAutoClose) {
 
         browser = await browserInstance;
 
+
         let LID = await searchLocationIdByName(locationName, browser);
+        if (!LID) throw "Город не найден!";
+        console.log("поиск (", LID.title, ") id: ", LID.id);
 
-        if (!LID.title) throw "Город не найден!";
 
-        console.log("search for", LID.title, "id: ", LID.id);
+        let flatConfig = FlatConfig.config();
+        let commercialConfig = CommercialConfig.config();
 
-        let offersTemplate = {
+        let offersTemplateForExcel = {
             sheetName: "Выгрузка",
             columnsKeys: offerKeys,
             columnsDesc: offerDescriptions,
-            rowsData: await CianScraperObject.jsonPagesScrape(browser, LID.id),
+            rowsData: await CianScraperObject.jsonPagesScrape(browser, LID.id, flatConfig),
         }
 
-        await ExcelWriter.writeInExcelX([offersTemplate], `${LID.title}.xlsx`);
+        await ExcelWriter.writeInExcelX([offersTemplateForExcel], `${LID.title}.xlsx`);
+
 
         !isAutoClose || await browser.close();
         return true;
