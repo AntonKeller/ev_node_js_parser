@@ -1,3 +1,4 @@
+const defineIndexStrOfStr = require("../algorithms/defineIndexStrOfStr");
 const locationsStateUrl = "https://www.cian.ru/";
 const stateJsonAddress = () => window._cianConfig['frontend-mainpage'].find(item => item.key === 'initialState').value.mainpage.regionsData;
 
@@ -8,47 +9,62 @@ const getRegionsData = async (page) => {
 };
 
 
-const search = (regionsData, name) => {
+const search = (regionsData, address) => {
 
-    let success = false;
-    let nameSplit = name.toLowerCase().split(" ");
+    let priorityIndices = [];
 
-    for (let i = 0; i < regionsData.regions.length; i++) {
+    // prioritization regions
+    for (let region of regionsData.regions) {
 
-        let title = regionsData.regions[i].title.toLowerCase();
-
-        for (let subName of nameSplit) {
-            success = (title.indexOf(subName) !== -1);
-            if (success) {
-                return regionsData.regions[i];
-                break;
-            }
+        const rang = defineIndexStrOfStr(address, region.title).rang;
+        if (rang > 0) {
+            priorityIndices.push({
+                ...region,
+                locationPriority: 0,
+                priority: rang,
+            })
         }
 
     }
 
-    for (let i = 0; i < regionsData.cities.length; i++) {
+    // prioritization cities
+    for (let city of regionsData.cities) {
 
-        let title = regionsData.cities[i].title.toLowerCase();
-
-        for (let subName of nameSplit) {
-            success = (title.indexOf(subName) !== -1);
-            if (success) {
-                return regionsData.cities[i];
-                break;
-            }
+        const rang = defineIndexStrOfStr(address, city.title).rang;
+        if (rang > 0) {
+            priorityIndices.push({
+                ...city,
+                locationPriority: 1,
+                priority: rang,
+            })
         }
-
     }
 
-    return {};
+    if (priorityIndices.length <= 0) return null;
+
+    // search hight priority address
+    if (priorityIndices.length > 1) {
+
+        let result = priorityIndices[0];
+        for (let i = 1; i < priorityIndices.length; i++) {
+            let current = priorityIndices[i];
+            if ((result.priority < current.priority) || (result.priority === current.priority && result.locationPriority < current.locationPriority)) {
+                result = current;
+            }
+        }
+        return result;
+    }
+
+    return priorityIndices[0];
 };
 
-const searchLocationIdByName = async (name, browser) => {
+const searchLocationIdByName = async (nameCity, browser) => {
+
     let page = await browser.newPage();
     const regionsData = await getRegionsData(page);
     await page.close();
-    return search(regionsData, name);
+    return search(regionsData, nameCity);
+
 };
 
 module.exports = searchLocationIdByName;

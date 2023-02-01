@@ -34,7 +34,7 @@ const ExcelWriter = {
     writeInExcelX: async (
         templates = [defaultTemplate],
         fileName = "default.xlsx",
-        params = {properties: {defaultColWidth: 18}},
+        params = {properties: {defaultColWidth: 18, tabColor:{argb:'FF00FF00'}}},
     ) => {
         const workbook = new Excel.Workbook();
         workbook.company = 'everest';

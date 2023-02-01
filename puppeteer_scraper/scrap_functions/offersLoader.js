@@ -2,29 +2,30 @@ const {COUNT_OFFERS_IN_ONE_PAGE, COUNT_PAGES_MAX, getOffer} = require("../sctruc
 
 const timeout = ms => new Promise(resolve => setTimeout(resolve, ms));
 
-const useRemoteConsole = (page, url, sleep_ms = 1200) => new Promise(async resolve => {
-
-    await page.goto(url);
-    await timeout(sleep_ms);
-    const results = await page.evaluateHandle(results => results, await page.evaluateHandle(() => window._cianConfig));
-    resolve(results.jsonValue());
+const useRemoteConsole = (page, url, sleep_ms = 1) => new Promise(async (resolve, reject) => {
+    try {
+        await page.goto(url);
+        await timeout(sleep_ms);
+        await page.waitForSelector("._25d45facb5--container--AncgU"); // logotype
+        const results = await page.evaluateHandle(results => results, await page.evaluateHandle(() => window._cianConfig));
+        resolve(results.jsonValue());
+    } catch {
+        console.log("function useRemoteConsole error");
+        reject("function useRemoteConsole error");
+    }
 });
 
+//urls generator
+const urlsGenerate = async (page, baseLink, getPageStateCallBack) => {
 
-// Urls generate
-const urlsGenerate = async (page, baseLink, getPageStateData) => {
-
-    // get json from console
+    // get json data from first page
     let pageSate = await useRemoteConsole(page, `${baseLink}&p=1`);
-    let firstResponse = getPageStateData(pageSate);
+    let firstResponse = getPageStateCallBack(pageSate);
 
     // Determine the number of pages
     let pagesCount;
-    if (Math.ceil(firstResponse.aggregatedOffers / COUNT_OFFERS_IN_ONE_PAGE) <= COUNT_PAGES_MAX) {
-        pagesCount = Math.ceil(firstResponse.aggregatedOffers / COUNT_OFFERS_IN_ONE_PAGE)
-    } else {
-        pagesCount = COUNT_PAGES_MAX;
-    }
+    pagesCount = Math.ceil(firstResponse.aggregatedOffers / COUNT_OFFERS_IN_ONE_PAGE);
+    if (pagesCount > COUNT_PAGES_MAX) pagesCount = COUNT_PAGES_MAX;
 
     let urls = [];
     for (let i = 1; i <= pagesCount; i++) {
@@ -35,33 +36,33 @@ const urlsGenerate = async (page, baseLink, getPageStateData) => {
 }
 
 
-// website offers request
+// website json offers loader
 const loadOffersFromWebsite = async (browser, locationID, config) => {
 
-    // config.baseLink(locationID), config.getPageStateData, config.offerType
     let baseLink = config.baseLink(locationID);
     let page = await browser.newPage();
     let urls = await urlsGenerate(page, baseLink, config.getPageStateData);
-    let responseOffersFullData = [];
-
+    let arrayOffersIsDone = [];
 
     for (let i = 0; i < urls.length; i++) {
-        let buff = config.getPageStateData(await useRemoteConsole(page, urls[i]));
-        responseOffersFullData = responseOffersFullData.concat(buff.offers);
-        console.log(`Загрузка: ${config.offerName}.....`, `${i + 1}/${urls.length}`);
+        let buff;
+        try {
+            //load box offers
+            buff = config.getPageStateData(await useRemoteConsole(page, urls[i])).offers;
+
+            //loading status
+            console.log(`Загрузка: ${config.offerName}.....`, `${i + 1}/${urls.length}`);
+
+            //get structured offers
+            arrayOffersIsDone = arrayOffersIsDone.concat(buff.map(offer => getOffer(offer)));
+        } catch (err) {
+            console.log(`${err} | function: useRemoteConsole, URL: ${urls[i]}`);
+            continue;
+        }
     }
-
-
-    // get structured offers
-    let offersArray = [];
-    let i = 0;
-    for (let buffOfferFullData of responseOffersFullData) {
-        offersArray = offersArray.concat(getOffer(responseOffersFullData[i], ++i));
-    }
-
 
     await page.close();
-    return offersArray;
+    return arrayOffersIsDone;
 };
 
 module.exports = loadOffersFromWebsite;
