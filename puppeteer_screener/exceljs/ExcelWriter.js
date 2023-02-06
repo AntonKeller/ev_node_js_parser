@@ -23,12 +23,13 @@ const ExcelWriter = {
         fileFormat = F_XLSX,
         params = {properties: {defaultColWidth: 18}},
     ) => {
+
         const workbook = new Excel.Workbook();
         workbook.addWorksheet('data', params).addRows(complex_array);
-
         workbook.xlsx.writeFile(`${file_name}.${fileFormat}`).catch(err => {
             console.log(err.message);
         });
+
     },
 
     writeInExcelX: async (
@@ -36,6 +37,7 @@ const ExcelWriter = {
         fileName = "default.xlsx",
         params = {properties: {defaultColWidth: 18, tabColor:{argb:'FF00FF00'}}},
     ) => {
+
         const workbook = new Excel.Workbook();
         workbook.company = 'everest';
 
@@ -49,6 +51,7 @@ const ExcelWriter = {
         await workbook.xlsx.writeFile(fileName).catch(err => {
             console.log(err.message);
         });
+
     }
 }
 
