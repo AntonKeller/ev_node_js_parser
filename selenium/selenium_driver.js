@@ -5,6 +5,8 @@ require("chromedriver");
 const chromeOptions = new chrome.Options();
 
 async function test() {
+
+
     let driver = await new Builder()
         .forBrowser("chrome")
         .setChromeOptions(chromeOptions.excludeSwitches("enable-logging")).build();

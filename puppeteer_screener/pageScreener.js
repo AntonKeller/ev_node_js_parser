@@ -30,25 +30,17 @@ const pagePromise = (page, urlObj, timeout_ms = 1500) => new Promise(async respo
 
     await page.goto(urlObj.url);
     await timeout(timeout_ms);
-    // let body = await page.$('body'); ->
     let body = await page.waitForSelector('body');
     let body_viewport = await body.boundingBox();
     let offer_card_page = await page.waitForSelector('.a10a3f92e9--offer_card_page-main--kaTJT');
     let removedPublicationStatus = false;
 
-    if ((await page.$(".a10a3f92e9--container--RXoIe")) !== null) {
-        removedPublicationStatus = true;
-    }
+    if ((await page.$(".a10a3f92e9--container--RXoIe")) !== null) removedPublicationStatus = true;
 
     if (offer_card_page !== null) {
 
-        let result;
-
         await adCleaner(page);
-
         let offer_card_page_main_viewport = await offer_card_page.boundingBox();
-
-        // common coordinates
         let x = body_viewport["x"];
         let w = body_viewport["width"];
         let y = body_viewport["y"];
@@ -67,13 +59,11 @@ const pagePromise = (page, urlObj, timeout_ms = 1500) => new Promise(async respo
             }
         });
 
-
         if (!removedPublicationStatus) {
 
             SecondScreenName = `${urlObj.urlId}_2.jpeg`;
 
             await page.screenshot({
-                // quality: 100, //Качество изображения
                 path: `${path.resolve(__dirname)}/images/${urlObj.urlId}_2.jpeg`,
                 clip: {
                     'x': x,
@@ -108,7 +98,6 @@ const pagePromise = (page, urlObj, timeout_ms = 1500) => new Promise(async respo
 const screen = async (browser, arrayObjectsUrl, timeout_ms = 20000) => {
 
     //copy arrayObjectsUrl in buffer
-
     let bufferUrlsObj = [];
     let index = 1;
 

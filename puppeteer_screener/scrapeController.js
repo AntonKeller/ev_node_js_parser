@@ -5,7 +5,7 @@ const loadUrlsFromExcel = require("./exceljs/urlsLoader")
 const createArrayFromObject = arrayObjectsUrls => {
 
     let arrayForReturn = [
-        Object.keys(arrayObjectsUrls[0]),
+        Object.keys(arrayObjectsUrls[0])
     ];
 
     //content forming
@@ -23,38 +23,36 @@ const createArrayFromObject = arrayObjectsUrls => {
     return arrayForReturn;
 }
 
-const scrapeController = {
 
-    screenshotScraper: async (browserInstance, folders, isLogging = true) => {
+const screenshotScraper = async (browserInstance, folders, isLogging = true) => {
 
-        let browser;
+    let browser;
 
-        try {
-            browser = await browserInstance;
-
-
-            // loading objects
-            console.log("Loading data from excel.....");
-            let arrayObjectsUrl = await loadUrlsFromExcel(folders, isLogging);
-            console.log("loaded", arrayObjectsUrl.length, "urls.");
+    try {
+        browser = await browserInstance;
 
 
-            // getting images from pages and saving
-            let saveInExcelObjectsUrl = await pageScreenerObject.screener(browser, arrayObjectsUrl, isLogging);
+        // loading objects
+        console.log("Loading data from excel.....");
+        let response = await loadUrlsFromExcel(folders, isLogging);
+        let arrayObjectsUrl = response.slice(0, 5);
+        console.log("loaded", arrayObjectsUrl.length, "urls.");
 
 
-            // Create matrix and save data in excel,
-            console.log("save matrix.....");
-            await ExcelWriter.writeInExcel(createArrayFromObject(saveInExcelObjectsUrl), "matrix", F_XLSX);
+        // getting images from pages and saving
+        let saveInExcelObjectsUrl =  await pageScreenerObject.screener(browser, arrayObjectsUrl, isLogging);
 
 
-        } catch (err) {
-            console.log("screenshot scraper error: ", err);
-        } finally {
-            await browser.close();
-        }
+        // Create matrix and save data in excel,
+        console.log("save matrix.....");
+        await ExcelWriter.writeInExcel(createArrayFromObject(saveInExcelObjectsUrl), "matrix", F_XLSX);
+
+
+    } catch (err) {
+        console.log("screenshot scraper error: ", err);
+    } finally {
+        await browser.close();
     }
-
 }
 
-module.exports = scrapeController;
+module.exports = screenshotScraper;
