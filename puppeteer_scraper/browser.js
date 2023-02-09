@@ -2,7 +2,7 @@ const {executablePath} = require('puppeteer')
 const puppeteer = require('puppeteer-extra');
 puppeteer.use(require('puppeteer-extra-plugin-stealth')());
 
-async function startBrowser(){
+async function startBrowser(headlessType = true){
 
     let browser;
 
@@ -10,9 +10,11 @@ async function startBrowser(){
 
         console.log("Opening the browser......");
         browser = await puppeteer.launch({
-            headless: true,
+            headless: headlessType,
+            isMobile:true,
             executablePath: executablePath(),
-            // slowMo: 1000,
+            // waitForInitialPage: true,
+            slowMo: 30,
             args: ["--disable-setuid-sandbox"],
             'ignoreHTTPSErrors': true
         });

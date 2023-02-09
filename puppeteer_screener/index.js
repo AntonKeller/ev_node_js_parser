@@ -1,10 +1,10 @@
 const browserObject = require('./browser');
 const screenshotScraper = require('./scrapeController');
-const loadUrlsFromExcel = require("./exceljs/urlsLoader");
+const loadUrlsFromExcel = require("../exceljs/urlsLoader");
 const CianScreener = require("./ev_screener_cian.ru");
 const process = require("process");
 const path = require("node:path");
-const {ExcelWriter} = require("./exceljs/ExcelWriter");
+const {ExcelWriter} = require("../exceljs/ExcelWriter");
 
 (async function start() {
 
