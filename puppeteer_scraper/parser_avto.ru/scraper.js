@@ -143,11 +143,11 @@ const getCookie = async (page) => {
 (async function a() {
 
     const w = 1920, h = 1080;
-    let browserInstance = await browserObject.startBrowser(true);
+    let browserInstance = await browserObject.startBrowser(false);
     let browser = await browserInstance;
     let page = await browser.newPage();
     await page.setViewport({width: w, height: h, deviceScaleFactor: 0});
-    // await getCookie(page) // сохраняем cookie
+    await getCookie(page) // сохраняем cookie
 
     // загружаем и устанавливаем cookie | загружаем офферы на все виды машин
     let cookie = JSON.parse(fs.readFileSync('cookie.json'));
