@@ -1,9 +1,9 @@
 // Расстояние Левенштейна
-let compareIndexLevenshtejn = (word1 = "лабрадор", word2 = "Лаборант") => {
+const indexLevenshtejn = (word_1 = "лабрадор", word_2 = "Лаборант") => {
 
     let finalArray = [];
-    let firstWord = word1.toLowerCase();
-    let secondWord = word2.toLowerCase();
+    let firstWord = word_1.toLowerCase();
+    let secondWord = word_2.toLowerCase();
     let firstMax = firstWord.length;
     let secondMax = secondWord.length;
 
@@ -41,25 +41,33 @@ let compareIndexLevenshtejn = (word1 = "лабрадор", word2 = "Лабора
             finalArray[i][j] = Math.min(...buff);
         }
     }
-    //
-    // for (let i = 0; i < finalArray.length; i++) {
-    //     for (let j = 0; j < finalArray[i].length; j++) {
-    //         finalArray[i][j] = String(finalArray[i][j]);
-    //         if ((i === finalArray.length - 1) && (j === finalArray[i].length - 1)) {
-    //             finalArray[i][j] = `(${finalArray[i][j]})`;
-    //         }
-    //     }
-    // }
-    //
-    // console.log("finalArray:\n", finalArray);
     finalArray = finalArray.flat(1);
-    console.log("Итог:", finalArray[finalArray.length - 1]);
+    // console.log("Итог:", finalArray[finalArray.length - 1]);
+    return finalArray[finalArray.length - 1];
+};
+
+// Массив расстояний Левенштейна
+const indexesLevenshtejn = (str_1, str_2) => {
+
+    let b_str_1 = str_1.replace(/[,.]/g, '').trim().toLowerCase().split(" ").filter(e => e.length > 0);
+    let b_str_2 = str_2.replace(/[,.]/g, '').trim().toLowerCase().split(" ").filter(e => e.length > 0);
+    let indexes = [];
+
+    for (let word_1 of b_str_1) {
+        for (let word_2 of b_str_2) {
+            indexes.push(indexLevenshtejn(word_1, word_2));
+        }
+    }
+
+    return indexes.sort();
+
 }
 
-compareIndexLevenshtejn()
 
-module.exports = compareIndexLevenshtejn;
-
+module.exports = {
+    indexLevenshtejn,
+    indexesLevenshtejn
+};
 
 
 

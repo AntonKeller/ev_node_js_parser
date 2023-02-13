@@ -1,4 +1,4 @@
-const excel_writer = require("../../puppeteer_screener/exceljs/ExcelWriter");
+const excel_writer = require("../../exceljs/ExcelWriter");
 const testJsonData = require("./testData");
 
 

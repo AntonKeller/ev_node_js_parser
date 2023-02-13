@@ -1,5 +1,5 @@
 const CianScraperObject = require('./scraper');
-const {ExcelWriter} = require("../puppeteer_screener/exceljs/ExcelWriter");
+const {ExcelWriter} = require("../exceljs/ExcelWriter");
 const {offerDescriptions, offerKeys} = require("./sctructures/offer");
 const searchLocationIdByName = require("./Geo");
 const {FlatConfig, CommercialConfig} = require("./cianConfig");

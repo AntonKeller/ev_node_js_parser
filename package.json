@@ -17,6 +17,7 @@
     "@nbelyh/exceljs": "^4.3.2",
     "chromedriver": "^108.0.0",
     "exceljs": "^4.3.0",
+    "lodash": "^4.17.21",
     "osmosis": "^1.1.10",
     "playwright": "^1.29.2",
     "playwright-extra": "^4.3.5",

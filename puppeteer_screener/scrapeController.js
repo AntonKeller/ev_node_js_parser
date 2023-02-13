@@ -1,6 +1,6 @@
 const pageScreenerObject = require('./pageScreener');
-const {ExcelWriter, F_XLSX} = require("./exceljs/ExcelWriter");
-const loadUrlsFromExcel = require("./exceljs/urlsLoader")
+const {ExcelWriter, F_XLSX} = require("../exceljs/ExcelWriter");
+const loadUrlsFromExcel = require("../exceljs/urlsLoader")
 
 const createArrayFromObject = arrayObjectsUrls => {
 

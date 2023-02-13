@@ -1,5 +1,5 @@
 const browserObject = require("../browser");
-const {ExcelWriter} = require("../../puppeteer_screener/exceljs/ExcelWriter");
+const {ExcelWriter} = require("../../exceljs/ExcelWriter");
 const process = require("process");
 const path = require("node:path");
 

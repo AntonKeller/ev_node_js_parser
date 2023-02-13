@@ -1,6 +1,6 @@
 const {executablePath} = require('puppeteer')
 const puppeteer = require('puppeteer-extra');
-const writeInExcel = require("./exceljs/ExcelWriter");
+const writeInExcel = require("../exceljs/ExcelWriter");
 puppeteer.use(require('puppeteer-extra-plugin-stealth')());
 
 
