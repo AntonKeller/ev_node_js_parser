@@ -33,17 +33,17 @@ const screenshotScraper = async (browserInstance, folders, isLogging = true) => 
 
 
         // loading objects
-        console.log("Loading data from excel.....");
+        console.log("Loading data from excel_data.....");
         let response = await loadUrlsFromExcel(folders, isLogging);
         let arrayObjectsUrl = response.slice(0, 5);
         console.log("loaded", arrayObjectsUrl.length, "urls.");
 
 
-        // getting images from pages and saving
+        // getting images_data from pages and saving
         let saveInExcelObjectsUrl =  await pageScreenerObject.screener(browser, arrayObjectsUrl, isLogging);
 
 
-        // Create matrix and save data in excel,
+        // Create matrix and save data in excel_data,
         console.log("save matrix.....");
         await ExcelWriter.writeInExcel(createArrayFromObject(saveInExcelObjectsUrl), "matrix", F_XLSX);
 

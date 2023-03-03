@@ -55,8 +55,8 @@ let AvitoScraper = {
 };
 
 (async function a() {
-        const w = 1620, h = 1080;
-    let browserInstance = await browserObject.startBrowser();
+    const w = 1620, h = 1080;
+    let browserInstance = await browserObject.startBrowser(false);
     let browser = await browserInstance;
     let page = await browser.newPage();
     await page.setViewport({width: w, height: h, deviceScaleFactor: 2});

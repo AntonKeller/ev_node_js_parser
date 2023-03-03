@@ -86,7 +86,7 @@ const loadUrlsFromExcel = async folders => {
     let responseUrlObjects = [];
     let arrayObjectsUrlResult = [];
 
-    //reading url from excel
+    //reading url from excel_data
     for (let fileName of folders) {
         responseUrlObjects = responseUrlObjects.concat(await getUrlsArray(fileName));
     }
